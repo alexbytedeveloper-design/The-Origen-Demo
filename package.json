@@ -1,0 +1,13 @@
+{
+  "name": "the-origen-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The Origen — sitio demo de parrilla y barra en La Habana",
+  "scripts": {
+    "dev:web": "npm --prefix frontend run dev",
+    "dev:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-api.ps1",
+    "build": "npm --prefix frontend run build",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-api.ps1"
+  }
+}

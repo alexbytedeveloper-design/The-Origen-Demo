@@ -1,0 +1,43 @@
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Build
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Entorno
+.env
+.env.local
+.env.production
+!.env.example
+
+# Base de datos local
+*.db
+*.db-journal
+*.sqlite3
+
+# Tests y cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sistema
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
