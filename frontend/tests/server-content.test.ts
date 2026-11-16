@@ -33,7 +33,7 @@ describe("getInitialContent", () => {
     await expect(getInitialContent("es")).resolves.toMatchObject({ locale: "es" });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("http://127.0.0.1:8000/api/v1/content/es");
+    expect(url).toBe("http://localhost:8000/api/v1/content/es");
     expect(init?.cache).toBe("no-store");
     expect(init?.signal).toBeInstanceOf(AbortSignal);
   });
@@ -44,7 +44,7 @@ describe("getInitialContent", () => {
     await getInitialContent("../es");
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      "http://127.0.0.1:8000/api/v1/content/..%2Fes",
+      "http://localhost:8000/api/v1/content/..%2Fes",
     );
   });
 

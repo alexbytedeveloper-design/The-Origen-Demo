@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getDictionary, isLocale } from "@/messages";
 import { photoCredits, privacySections } from "@/lib/legal";
+import { breadcrumbJsonLd, pageMetadata, SITE_NAME } from "@/lib/seo";
 
 type LegalPageProps = {
   params: Promise<{ locale: string; slug: string }>;
@@ -20,13 +22,15 @@ export async function generateMetadata({ params }: LegalPageProps): Promise<Meta
   if (!isLocale(locale) || !isSlug(slug)) return {};
 
   const dict = getDictionary(locale);
-  return {
-    title:
-      slug === "privacidad"
-        ? `${dict.legal.privacyTitle} — The Origen`
-        : `${dict.legal.creditsTitle} — The Origen`,
-    robots: { index: false, follow: true },
-  };
+  const privacy = slug === "privacidad";
+
+  return pageMetadata({
+    locale,
+    suffix: `/legal/${slug}`,
+    title: privacy ? dict.legal.privacyTitle : dict.legal.creditsTitle,
+    description: privacy ? dict.legal.privacyIntro : dict.legal.creditsIntro,
+    robots: { index: true, follow: true },
+  });
 }
 
 export default async function LegalPage({ params }: LegalPageProps) {
@@ -37,6 +41,18 @@ export default async function LegalPage({ params }: LegalPageProps) {
 
   return (
     <article className="legal">
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: SITE_NAME, suffix: "" },
+          {
+            name:
+              slug === "privacidad"
+                ? dict.legal.privacyTitle
+                : dict.legal.creditsTitle,
+            suffix: `/legal/${slug}`,
+          },
+        ])}
+      />
       <div className="container">
         <p className="eyebrow">The Origen</p>
         <h1 className="section__title">

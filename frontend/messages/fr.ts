@@ -6,6 +6,14 @@ export const fr: Dict = {
     title: "The Origen — Pierre chaude et bar à La Havane",
     description:
       "Cuisson sur pierre chaude, produits du marché et cocktails classiques à Miramar, La Havane. Réservations par téléphone ou WhatsApp.",
+    keywords: [
+      "pierre chaude",
+      "restaurant Miramar",
+      "La Havane",
+      "steakhouse",
+      "cocktails",
+      "réserver une table",
+    ],
   },
   nav: {
     house: "Nous",

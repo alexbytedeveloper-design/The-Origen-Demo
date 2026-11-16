@@ -6,6 +6,14 @@ export const en: Dict = {
     title: "The Origen — Hot stone and bar in Havana",
     description:
       "Hot-stone cooking, market produce and classic cocktails in Miramar, Havana. Book by phone or WhatsApp.",
+    keywords: [
+      "hot stone",
+      "restaurant Miramar",
+      "Havana",
+      "steakhouse",
+      "cocktails",
+      "book a table",
+    ],
   },
   nav: {
     house: "Us",

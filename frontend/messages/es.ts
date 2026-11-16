@@ -1,7 +1,7 @@
 import { ADDRESS, INSTAGRAM_HANDLE, PHONE_DISPLAY } from "@/lib/contact";
 
 export type Dict = {
-  meta: { title: string; description: string };
+  meta: { title: string; description: string; keywords: string[] };
   nav: {
     house: string;
     menu: string;
@@ -193,6 +193,14 @@ export const es: Dict = {
     title: "The Origen — Piedra caliente y barra en La Habana",
     description:
       "Piedra caliente, producto de mercado y coctelería clásica en Miramar, La Habana. Reservas por teléfono o WhatsApp.",
+    keywords: [
+      "piedra caliente",
+      "restaurante Miramar",
+      "La Habana",
+      "steakhouse",
+      "coctelería",
+      "reservar mesa",
+    ],
   },
   nav: {
     house: "Nosotros",

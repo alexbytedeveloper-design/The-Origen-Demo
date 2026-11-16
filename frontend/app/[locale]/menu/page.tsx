@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ContentProvider } from "@/components/content/ContentProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { MenuPageView } from "@/components/menu/MenuPageView";
+import {
+  breadcrumbJsonLd,
+  menuJsonLd,
+  pageMetadata,
+  SITE_NAME,
+} from "@/lib/seo";
 import { getInitialContent } from "@/lib/server-content";
-import { getDictionary, isLocale, locales } from "@/messages";
+import { getDictionary, isLocale } from "@/messages";
 
 type MenuPageProps = {
   params: Promise<{ locale: string }>;
@@ -18,16 +25,12 @@ export async function generateMetadata({
 
   const dict = getDictionary(locale);
 
-  return {
-    title: `${dict.menu.pageTitle} — The Origen`,
+  return pageMetadata({
+    locale,
+    suffix: "/menu",
+    title: dict.menu.pageTitle,
     description: dict.menu.pageLead,
-    alternates: {
-      canonical: `/${locale}/menu`,
-      languages: Object.fromEntries(
-        locales.map((code) => [code, `/${code}/menu`]),
-      ),
-    },
-  };
+  });
 }
 
 export default async function MenuPage({ params }: MenuPageProps) {
@@ -39,6 +42,15 @@ export default async function MenuPage({ params }: MenuPageProps) {
 
   return (
     <ContentProvider locale={locale} initialData={content}>
+      <JsonLd
+        data={[
+          breadcrumbJsonLd(locale, [
+            { name: SITE_NAME, suffix: "" },
+            { name: dict.menu.pageTitle, suffix: "/menu" },
+          ]),
+          menuJsonLd(locale, dict, content),
+        ]}
+      />
       <MenuPageView dict={dict} locale={locale} />
     </ContentProvider>
   );

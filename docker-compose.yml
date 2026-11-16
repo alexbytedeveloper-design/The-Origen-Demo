@@ -42,9 +42,12 @@ services:
       context: ./frontend
       args:
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        API_INTERNAL_URL: http://api:8000
     restart: unless-stopped
     environment:
+      # Runtime: lo usa el SSR al pedir la carta. El rewrite se fija en el build.
       API_INTERNAL_URL: http://api:8000
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
     depends_on:
       - api
     ports:

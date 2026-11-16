@@ -1,37 +1,34 @@
 import type { MetadataRoute } from "next";
 
+import { SITE_URL } from "@/lib/api";
+import { languageAlternates } from "@/lib/seo";
 import { locales } from "@/messages";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(
-  /\/$/,
-  "",
-);
+/**
+ * El sitemap se genera en el build. `lastModified` refleja ese momento: no
+ * cambiamos la fecha en cada petición para no enviar señales falsas a Google.
+ */
+const BUILD_DATE = new Date();
+
+function entry(
+  suffix: string,
+  priority: number,
+  changeFrequency: "weekly" | "yearly",
+): MetadataRoute.Sitemap[number][] {
+  return locales.map((locale) => ({
+    url: `${SITE_URL}/${locale}${suffix}`,
+    lastModified: BUILD_DATE,
+    changeFrequency,
+    priority,
+    alternates: { languages: languageAlternates(suffix) },
+  }));
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const updated = new Date();
-
-  const home = locales.map((locale) => ({
-    url: `${SITE}/${locale}`,
-    lastModified: updated,
-    changeFrequency: "weekly" as const,
-    priority: 1,
-  }));
-
-  const menu = locales.map((locale) => ({
-    url: `${SITE}/${locale}/menu`,
-    lastModified: updated,
-    changeFrequency: "weekly" as const,
-    priority: 0.9,
-  }));
-
-  const legal = locales.flatMap((locale) =>
-    ["privacidad", "creditos"].map((slug) => ({
-      url: `${SITE}/${locale}/legal/${slug}`,
-      lastModified: updated,
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
-    })),
-  );
-
-  return [...home, ...menu, ...legal];
+  return [
+    ...entry("", 1, "weekly"),
+    ...entry("/menu", 0.9, "weekly"),
+    ...entry("/legal/privacidad", 0.3, "yearly"),
+    ...entry("/legal/creditos", 0.3, "yearly"),
+  ];
 }

@@ -9,6 +9,14 @@ import { RevealObserver } from "@/components/RevealObserver";
 import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { Footer } from "@/components/site/Footer";
 import { Header } from "@/components/site/Header";
+import { SITE_URL } from "@/lib/api";
+import {
+  absoluteUrl,
+  alternateOpenGraphLocales,
+  languageAlternates,
+  openGraphLocale,
+  SITE_NAME,
+} from "@/lib/seo";
 import { getDictionary, isLocale, locales, type Locale } from "@/messages";
 
 type LayoutProps = {
@@ -33,31 +41,59 @@ export async function generateMetadata({
   if (!isLocale(locale)) return {};
 
   const dict = getDictionary(locale);
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const canonical = absoluteUrl(`/${locale}`);
 
   return {
-    metadataBase: new URL(site),
-    title: dict.meta.title,
+    metadataBase: new URL(SITE_URL),
+    title: { default: dict.meta.title, template: `%s — ${SITE_NAME}` },
     description: dict.meta.description,
+    keywords: dict.meta.keywords,
+    applicationName: SITE_NAME,
+    category: "restaurant",
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    authors: [{ name: SITE_NAME, url: canonical }],
     alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries(locales.map((code) => [code, `/${code}`])),
+      canonical,
+      languages: languageAlternates(),
     },
     openGraph: {
       type: "website",
-      siteName: "The Origen",
+      siteName: SITE_NAME,
       title: dict.meta.title,
       description: dict.meta.description,
-      locale,
-      url: `/${locale}`,
-      images: [{ url: "/images/hero-tomahawk.jpg", width: 1600, height: 1067, alt: dict.hero.photoAlt }],
+      locale: openGraphLocale(locale),
+      alternateLocale: alternateOpenGraphLocales(locale),
+      url: canonical,
     },
     twitter: {
       card: "summary_large_image",
       title: dict.meta.title,
       description: dict.meta.description,
     },
-    robots: { index: true, follow: true },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
+    icons: {
+      icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+      shortcut: "/icon.svg",
+      apple: "/icon.svg",
+    },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      title: SITE_NAME,
+      statusBarStyle: "black-translucent",
+    },
+    formatDetection: { telephone: true, address: true, email: true },
   };
 }
 

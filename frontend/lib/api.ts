@@ -1,3 +1,42 @@
+/**
+ * Origen público del backend.
+ *
+ * En el navegador las peticiones no van directas a este dominio: se piden a
+ * `/backend/api/v1/...` y Next las reescribe a `API_URL` en el servidor (ver
+ * `next.config.ts`). Así las cookies de sesión y el token CSRF siguen siendo de
+ * primer origen, tanto en local como en producción.
+ */
+export const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL?.trim() || "http://localhost:8000"
+).replace(/\/+$/, "");
+
+/**
+ * Origen del backend visto desde el proceso de Next.
+ *
+ * En Docker el navegador y el servidor no comparten red: el servicio se llama
+ * `http://api:8000`, mientras que `NEXT_PUBLIC_API_URL` sigue siendo la URL
+ * pública.
+ */
+export const API_INTERNAL_URL = (
+  process.env.API_INTERNAL_URL?.trim() || API_URL
+).replace(/\/+$/, "");
+
+/** Prefijo versionado que expone FastAPI. */
+export const API_PATH = "/api/v1";
+
+/** Base de mismo origen que consumen los componentes de cliente. */
+export const API_BASE = `/backend${API_PATH}`;
+
+/** URL absoluta para llamadas de servidor (SSR/RSC). */
+export function apiServerUrl(path: string): string {
+  return `${API_INTERNAL_URL}${API_PATH}${path}`;
+}
+
+/** URL pública del sitio, sin barra final. */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"
+).replace(/\/+$/, "");
+
 export type Dish = {
   name: string;
   description?: string;
@@ -68,8 +107,6 @@ export class ApiError extends Error {
   }
 }
 
-const BASE = "/api";
-
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
@@ -90,7 +127,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   let response: Response;
   try {
-    response = await fetch(`${BASE}${path}`, {
+    response = await fetch(`${API_BASE}${path}`, {
       ...init,
       headers,
       credentials: "same-origin",
@@ -149,4 +186,4 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
-};
+};

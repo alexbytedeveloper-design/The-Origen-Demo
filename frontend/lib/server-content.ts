@@ -1,6 +1,11 @@
+import { apiServerUrl } from "@/lib/api";
 import type { ContentPayload } from "@/lib/api";
 
-const API_URL = "/api";
+/**
+ * Espera máxima de la carga inicial. Una lambda recién despertada puede tardar
+ * varios segundos; pasado este margen el cliente reintenta en el navegador.
+ */
+const TIMEOUT_MS = 4000;
 
 /**
  * Carga inicial de la carta en el servidor.
@@ -14,16 +19,16 @@ export async function getInitialContent(
   locale: string,
 ): Promise<ContentPayload | null> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 2500);
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
     const response = await fetch(
-      `/api/content/${encodeURIComponent(locale)}`,
+      apiServerUrl(`/content/${encodeURIComponent(locale)}`),
       {
         cache: "no-store",
         headers: { Accept: "application/json" },
         signal: controller.signal,
-      }
+      },
     );
 
     if (!response.ok) return null;
@@ -46,4 +51,4 @@ export async function getInitialContent(
   } finally {
     clearTimeout(timer);
   }
-}
+}
