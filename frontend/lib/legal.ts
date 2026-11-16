@@ -8,7 +8,7 @@ export const privacySections: Record<Locale, Section[]> = {
     {
       heading: "Qué se guarda",
       body: [
-        "El nombre, el correo, el teléfono y las notas que escribas al reservar. Si creas una cuenta, también el nombre y el correo. Las contraseñas se guardan cifradas con Argon2id: nadie en la casa puede leerlas.",
+        "El nombre, el correo, el teléfono y las notas que escribas al reservar. Si creas una cuenta, también el nombre y el correo. Las contraseñas se guardan cifradas con Argon2id: nadie en The Origen puede leerlas.",
       ],
     },
     {
@@ -40,7 +40,7 @@ export const privacySections: Record<Locale, Section[]> = {
     {
       heading: "What we keep",
       body: [
-        "The name, email, phone number and notes you enter when booking. If you create an account, your name and email as well. Passwords are stored hashed with Argon2id: nobody in the house can read them.",
+        "The name, email, phone number and notes you enter when booking. If you create an account, your name and email as well. Passwords are stored hashed with Argon2id: nobody at The Origen can read them.",
       ],
     },
     {
@@ -72,7 +72,7 @@ export const privacySections: Record<Locale, Section[]> = {
     {
       heading: "Ce qui est conservé",
       body: [
-        "Le nom, le courriel, le téléphone et les remarques saisies lors de la réservation. Si vous créez un compte, le nom et le courriel également. Les mots de passe sont conservés hachés avec Argon2id : personne dans la maison ne peut les lire.",
+        "Le nom, le courriel, le téléphone et les remarques saisies lors de la réservation. Si vous créez un compte, le nom et le courriel également. Les mots de passe sont conservés hachés avec Argon2id : personne chez The Origen ne peut les lire.",
       ],
     },
     {
@@ -104,7 +104,7 @@ export const privacySections: Record<Locale, Section[]> = {
     {
       heading: "Что хранится",
       body: [
-        "Имя, почта, телефон и пожелания, которые вы указываете при бронировании. Если вы создаёте аккаунт — также имя и почта. Пароли хранятся в виде хеша Argon2id: прочитать их не может никто в доме.",
+        "Имя, почта, телефон и пожелания, которые вы указываете при бронировании. Если вы создаёте аккаунт — также имя и почта. Пароли хранятся в виде хеша Argon2id: прочитать их не может никто в The Origen.",
       ],
     },
     {

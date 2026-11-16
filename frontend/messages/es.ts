@@ -42,8 +42,6 @@ export type Dict = {
   };
   menu: {
     label: string;
-    title: string;
-    lead: string;
     pageTitle: string;
     pageLead: string;
     navLabel: string;
@@ -52,7 +50,6 @@ export type Dict = {
     retry: string;
     note: string;
     book: string;
-    fullMenu: string;
     backHome: string;
     priceNote: string;
     indexLabel: string;
@@ -198,8 +195,8 @@ export const es: Dict = {
       "Piedra caliente, producto de mercado y coctelería clásica en Miramar, La Habana. Reservas por teléfono o WhatsApp.",
   },
   nav: {
-    house: "La casa",
-    menu: "Carta",
+    house: "Nosotros",
+    menu: "Menú",
     fire: "Piedra",
     reviews: "Reseñas",
     events: "Eventos",
@@ -213,21 +210,21 @@ export const es: Dict = {
   },
   hero: {
     headline: "Sabores que cruzan océanos.",
-    lead: "Cortes que se terminan en la mesa sobre piedra caliente, producto de mercado y coctelería clásica. Una casa de Miramar.",
+    lead: "Cortes que se terminan en la mesa sobre piedra caliente, producto de mercado y coctelería clásica. En el corazón de Miramar.",
     cta: "Reservar mesa",
-    secondary: "Ver la carta",
+    secondary: "Ver el menú",
     place: "Calle 3ra entre 24 y 26 · Miramar",
     photoAlt: "Corte de res servido sobre piedra caliente",
   },
   house: {
-    label: "La casa",
-    title: "Una casa de Miramar y una piedra caliente en el centro.",
-    p1: "Abrimos en una casa de Miramar, a pocas calles del malecón. Quedan el portal, los vitrales y el patio de baldosas. Cambiamos la cocina y pusimos la piedra en el centro.",
-    p2: "El producto llega del mercado y del puerto; la carne se sella y se termina en la mesa sobre piedra caliente. La carta se ajusta a lo que hay.",
+    label: "Nosotros",
+    title: "Un lugar para disfrutar.",
+    p1: "A dos calles del malecón, un portal de vitrales y un patio de baldosas reciben al visitante. La cocina gira alrededor de la piedra; el resto lo dicta el mercado.",
+    p2: "El producto llega del mercado y del puerto; la carne se sella y se termina en la mesa sobre piedra caliente. El menú se ajusta a lo que hay.",
     caption: "La mesa del patio, al final de la tarde.",
-    photoAlt: "Mesa larga puesta en el patio de la casa",
-    sealTop: "Estd",
-    sealYear: "2025",
+    photoAlt: "Mesa larga puesta en el patio interior.",
+    sealTop: "Miramar",
+    sealYear: "Cuba",
     addressKey: "Dirección",
     addressValue: ADDRESS,
     hoursKey: "Horario",
@@ -236,51 +233,48 @@ export const es: Dict = {
     instagramValue: INSTAGRAM_HANDLE,
   },
   menu: {
-    label: "Carta",
-    title: "Lo que sale de la cocina y de la barra.",
-    lead: "Seis secciones, de la coctelería al café. Los cortes se terminan en la mesa sobre piedra caliente.",
-    pageTitle: "La carta completa.",
+    label: "Menú",
+    pageTitle: "Menú",
     pageLead:
-      "De la coctelería al café, con los cortes a la piedra en el centro. Precios en USD, impuestos incluidos.",
-    navLabel: "Secciones de la carta",
-    loading: "Cargando la carta",
-    error: "La carta no cargó. Revisa la conexión e inténtalo otra vez.",
+      "Coctelería, cocina de mercado y cortes que se terminan en la piedra. Una carta que cambia con el día.",
+    navLabel: "Secciones del menú",
+    loading: "Cargando el menú",
+    error: "El menú no cargó. Revisa la conexión e inténtalo otra vez.",
     retry: "Reintentar",
     note: "Precios en USD, impuestos incluidos.",
     book: "Reservar mesa",
-    fullMenu: "Abrir la carta en una página",
     backHome: "Volver al inicio",
     priceNote: "Precios en USD",
     indexLabel: "Índice",
     chapterWord: "Capítulo",
-    topLabel: "Inicio de la carta",
-    photoAlt: "Mesa y carta de The Origen",
+    topLabel: "Inicio del menú",
+    photoAlt: "Mesa y menú de The Origen",
   },
   fire: {
     label: "La piedra",
-    title: "Piedra, sal y el punto justo.",
+    title: "El punto exacto de la carne sobre tu mesa.",
     p1: "La piedra se calienta antes del servicio y llega a la mesa para que el corte termine de hacerse delante de ti. No hay humo que esconda el punto: se mira, se corta y se come.",
-    p2: "Sal marina, pimienta negra y chimichurri de la casa. Lo demás lo hace la piedra.",
+    p2: "Sal marina, pimienta negra y nuestro chimichurri. Lo demás lo hace la piedra.",
     caption: "El corte se elige y se atempera antes de llegar a la piedra.",
     photoAlt: "Corte de res antes de pasar a la piedra caliente",
     items: [
       {
-        title: "La piedra",
+        title: "El sello",
         text: "Se calienta antes del servicio y llega a la mesa para sellar el corte en el último momento.",
       },
       {
-        title: "Producto de mercado",
-        text: "Carne, pescado y huerta se eligen cada mañana; la carta se cierra con lo que hay.",
+        title: "Lo que trae el día",
+        text: "Carne, pescado y huerta se eligen cada mañana; el menú se cierra con lo que hay.",
       },
       {
-        title: "El punto",
+        title: "El punto justo",
         text: "El corte se termina en la mesa, a la vista. Se sirve con papas doradas, ensalada y chimichurri.",
       },
     ],
   },
   reviews: {
-    label: "Lo que dicen",
-    title: "Mesa ocupada, copa servida.",
+    label: "La mesa opina",
+    title: "Siempre se habla al final.",
     lead: "Seis mesas, seis noches, seis opiniones.",
     datePrefix: "",
     sample: "Muestra",
@@ -288,16 +282,16 @@ export const es: Dict = {
       "Reseñas de muestra para ver la sección terminada; se sustituirán por las reales al publicar.",
   },
   bar: {
-    label: "La barra",
-    title: "Ron, hielo claro y una mano que no se apura.",
-    copy: "La barra abre con la casa, a mediodía. El Bodegón, el Golpe Bajo y el Coco Bay son la puerta de entrada; detrás hay una carta larga de clásicos.",
+    label: "Coctelería",
+    title: "Detrás de la barra, el tiempo se mide en sorbos.",
+    copy: "La barra abre a mediodía. El Bodegón, el Golpe Bajo y el Coco Bay son la puerta de entrada; detrás hay un menú largo de clásicos.",
     photoAlt: "Cócteles servidos en la barra",
   },
   events: {
-    label: "Agenda",
-    title: "La casa también suena.",
-    lead: "Cantantes invitados, conciertos y noches que se repiten. Noviembre viene cargado; el programa se anunciará pronto.",
-    recurringTitle: "Lo que se repite",
+    label: "La noche",
+    title: "La noche también suena.",
+    lead: "Cantantes invitados, conciertos y noches que se repiten. El programa de noviembre se anunciará pronto.",
+    recurringTitle: "Noches que vuelven",
     recurring: [
       {
         title: "Música en vivo",
@@ -308,16 +302,16 @@ export const es: Dict = {
         text: "Fechas especiales con artistas invitados y aforo corto.",
       },
       {
-        title: "Catas & encuentros",
+        title: "Catas y encuentros",
         text: "Ron, habano y conversación alrededor de una mesa larga.",
       },
       {
         title: "Eventos privados",
-        text: "La casa se reserva para celebraciones y encuentros de empresa.",
+        text: "Reservamos el espacio para celebraciones y encuentros de empresa.",
       },
     ],
     monthLabel: "Noviembre 2026",
-    monthTitle: "Un mes cargado.",
+    monthTitle: "La agenda de noviembre.",
     monthLead:
       "Habrá conciertos, invitados y noches especiales. Las fechas y los nombres se publican pronto.",
     monthStatus: "Por confirmar",
@@ -325,7 +319,7 @@ export const es: Dict = {
     slotLabel: "Evento por anunciar",
     habano: {
       badge: "Evento especial",
-      title: "Noche de Habano.",
+      title: "Habano, ron y sobremesa.",
       lead: "Una noche dedicada al habano, el ron y la conversación, con invitados y una selección especial.",
       meta: "Fecha y detalles por confirmar",
       cta: "Solicitar información",
@@ -335,7 +329,7 @@ export const es: Dict = {
   },
   booking: {
     label: "Reservas",
-    title: "Reservar una mesa.",
+    title: "Una mesa para ti.",
     copy: "Reserva por teléfono o WhatsApp. Para grupos grandes, escríbenos y lo organizamos.",
     hoursKey: "Horario",
     hoursValue: "Todos los días\n12:00–00:00",
@@ -401,8 +395,8 @@ export const es: Dict = {
     errGeneric: "No se pudo completar la operación.",
   },
   footer: {
-    claim: "Piedra caliente, barra y una casa en Miramar.",
-    colHouse: "La casa",
+    claim: "Piedra caliente, barra y Miramar al fondo.",
+    colHouse: "Nosotros",
     colContact: "Contacto",
     colHours: "Horario",
     instagram: "Instagram",

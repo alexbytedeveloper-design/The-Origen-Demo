@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import ACCESS_COOKIE
@@ -25,15 +25,4 @@ async def optional_user(
     user = await db.get(User, subject)
     if user is None or not user.is_active:
         return None
-    return user
-
-
-async def current_user(
-    user: User | None = Depends(optional_user),
-) -> User:
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"detail": "No autenticado", "code": "unauthorized"},
-        )
     return user

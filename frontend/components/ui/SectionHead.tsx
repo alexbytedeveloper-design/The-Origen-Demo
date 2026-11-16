@@ -9,7 +9,7 @@ type SectionHeadProps = {
 
 /**
  * Cabecera editorial: capítulo en oro, título en Prata y filete con rombo.
- * El número no anuncia una sección del menú: ordena el recorrido de la casa.
+ * El número no anuncia una sección del menú: ordena el recorrido del local.
  */
 export function SectionHead({
   index,

@@ -14,15 +14,24 @@ router = APIRouter(prefix="/content", tags=["content"])
 LOCALES = ("es", "en", "fr", "ru")
 CONTENT_DIR = Path(__file__).resolve().parent.parent / "content"
 
+# El contenido cambia poco: se guarda el JSON ya leído y solo se vuelve a
+# abrir cuando cambia la fecha de modificación del archivo.
+_CACHE: dict[str, tuple[float, dict]] = {}
+
 
 def _load(locale: str) -> tuple[dict, datetime]:
     path = CONTENT_DIR / f"{locale}.json"
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
-    updated = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    payload["locale"] = locale
-    payload["updatedAt"] = updated.isoformat()
-    return payload, updated
+    modified = path.stat().st_mtime
+    updated = datetime.fromtimestamp(modified, tz=timezone.utc)
+    cached = _CACHE.get(locale)
+    if cached is not None and cached[0] == modified:
+        payload = cached[1]
+    else:
+        with path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+        _CACHE[locale] = (modified, payload)
+
+    return {**payload, "locale": locale, "updatedAt": updated.isoformat()}, updated
 
 
 @router.get("/{locale}")
@@ -45,5 +54,6 @@ async def content(locale: str) -> JSONResponse:
         payload,
         headers={
             "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+            "Content-Language": locale,
         },
     )

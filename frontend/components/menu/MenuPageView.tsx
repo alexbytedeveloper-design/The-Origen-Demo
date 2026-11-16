@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { useContent } from "@/components/content/ContentProvider";
 import { useContentOnView } from "@/components/content/useContentOnView";
 import { MenuBook } from "@/components/menu/MenuBook";
+import { ADDRESS } from "@/lib/contact";
 import type { Dict } from "@/messages/es";
 import type { Locale } from "@/messages";
 
@@ -39,17 +40,17 @@ export function MenuPageView({
           <p className="menu-page__meta">
             {dict.menu.priceNote}
             <span aria-hidden="true"> · </span>
-            Miramar, La Habana
+            {ADDRESS}
           </p>
         </div>
 
-        <a className="menu-page__cue" href="#carta-cocteleria">
+        <a className="menu-page__cue" href="#carta-lista">
           <span aria-hidden="true" />
           {dict.menu.indexLabel}
         </a>
       </div>
 
-      <div className="menu-page__stage">
+      <div className="menu-page__stage" id="carta-lista">
         <div className="container container--wide">
           <MenuBook
             status={status}

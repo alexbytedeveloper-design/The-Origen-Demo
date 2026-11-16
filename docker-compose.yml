@@ -22,10 +22,14 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql+asyncpg://origen:${POSTGRES_PASSWORD:-origen}@db:5432/origen
-      JWT_SECRET: ${JWT_SECRET:-cambia-esto-por-un-secreto-de-64-caracteres}
-      FRONTEND_ORIGIN: http://localhost:3000
+      # Demo local por HTTP. Para producción real: APP_ENV=production,
+      # COOKIE_SECURE=true, FRONTEND_ORIGIN=https://… y secretos propios.
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-0123456789abcdef}
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:-dev-data-key-0123456789abcdef!!!}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,api,web,testserver}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
       COOKIE_SECURE: "false"
-      APP_ENV: production
+      APP_ENV: development
       SEED_DEMO: "true"
     depends_on:
       db:
@@ -34,11 +38,13 @@ services:
       - "8000:8000"
 
   web:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
     restart: unless-stopped
     environment:
       API_INTERNAL_URL: http://api:8000
-      NEXT_PUBLIC_SITE_URL: http://localhost:3000
     depends_on:
       - api
     ports:

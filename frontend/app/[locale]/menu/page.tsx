@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ContentProvider } from "@/components/content/ContentProvider";
 import { MenuPageView } from "@/components/menu/MenuPageView";
+import { getInitialContent } from "@/lib/server-content";
 import { getDictionary, isLocale, locales } from "@/messages";
 
 type MenuPageProps = {
@@ -34,9 +35,10 @@ export default async function MenuPage({ params }: MenuPageProps) {
   if (!isLocale(locale)) notFound();
 
   const dict = getDictionary(locale);
+  const content = await getInitialContent(locale);
 
   return (
-    <ContentProvider locale={locale}>
+    <ContentProvider locale={locale} initialData={content}>
       <MenuPageView dict={dict} locale={locale} />
     </ContentProvider>
   );

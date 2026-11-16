@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import get_db
 from ..deps import optional_user
 from ..models import Reservation, User
+from ..net import client_host
 from ..rate_limit import limiter
 from ..schemas import ReservationIn, ReservationOut
 
@@ -21,7 +22,7 @@ async def create_reservation(
     db: AsyncSession = Depends(get_db),
     user: User | None = Depends(optional_user),
 ) -> Reservation:
-    host = request.client.host if request.client else "unknown"
+    host = client_host(request)
     wait = limiter.hit(f"reserve:{host}", limit=10, window=3600)
     if wait:
         raise HTTPException(

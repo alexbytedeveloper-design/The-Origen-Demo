@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import sqlite3
 from datetime import date, timedelta
+from pathlib import Path
 
 from fastapi.testclient import TestClient
+
+from app.crypto import PREFIX
 
 
 def _payload(**overrides):
@@ -55,3 +59,30 @@ def test_party_size_rejected(client: TestClient, csrf: dict[str, str]) -> None:
         "/api/v1/reservations", json=_payload(partySize=12), headers=csrf
     )
     assert response.status_code == 422
+
+
+def test_personal_data_is_encrypted_at_rest(
+    client: TestClient, csrf: dict[str, str], db_file: Path
+) -> None:
+    email = "privacidad@example.com"
+    response = client.post(
+        "/api/v1/reservations",
+        json=_payload(name="Cliente Privado", email=email, phone="+53 55555555"),
+        headers=csrf,
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["email"] == email
+    assert body["name"] == "Cliente Privado"
+
+    with sqlite3.connect(db_file) as connection:
+        row = connection.execute(
+            "SELECT name, email, phone, notes FROM reservations WHERE id = ?",
+            (body["id"],),
+        ).fetchone()
+
+    assert row is not None
+    assert all(value.startswith(PREFIX) for value in row)
+    assert email not in row[1]
+    assert "Cliente Privado" not in row[0]
+

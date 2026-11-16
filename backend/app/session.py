@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import secrets
-
 from fastapi import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -55,7 +53,7 @@ def clear_session(response: Response) -> None:
             samesite="lax",
         )
     # Un CSRF nuevo tras salir, por si el navegador conserva la página abierta.
-    _cookie(response, CSRF_COOKIE, secrets.token_urlsafe(32), 3600, False)
+    _cookie(response, CSRF_COOKIE, new_csrf_token(), 3600, False)
 
 
 __all__ = ["issue_session", "clear_session"]

@@ -8,6 +8,8 @@
     "dev:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-api.ps1",
     "build": "npm --prefix frontend run build",
     "typecheck": "npm --prefix frontend run typecheck",
-    "test:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-api.ps1"
+    "test:web": "npm --prefix frontend run test",
+    "test:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-api.ps1",
+    "stress:api": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stress-api.ps1"
   }
 }

@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
+from .clock import restaurant_today
+
 BOOKING_SLOTS = tuple(
     f"{hour:02d}:{minute:02d}"
     for hour in range(12, 23)
@@ -28,6 +30,8 @@ class UserOut(BaseModel):
 
 
 class RegisterIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str = Field(min_length=2, max_length=80)
     email: EmailStr
     password: str = Field(min_length=10, max_length=128)
@@ -49,11 +53,15 @@ class RegisterIn(BaseModel):
 
 
 class LoginIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     email: EmailStr
     password: str = Field(min_length=1, max_length=128)
 
 
 class ReservationIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     date: Date
     time: str
     partySize: int = Field(ge=1, le=8)
@@ -72,7 +80,7 @@ class ReservationIn(BaseModel):
     @field_validator("date")
     @classmethod
     def valid_date(cls, value: Date) -> Date:
-        today = Date.today()
+        today = restaurant_today()
         if value < today or value > today + timedelta(days=MAX_DAYS_AHEAD):
             raise ValueError("Fecha fuera de plazo")
         return value
@@ -80,6 +88,7 @@ class ReservationIn(BaseModel):
     @field_validator("phone")
     @classmethod
     def valid_phone(cls, value: str) -> str:
+        value = value.strip()
         if not PHONE_RE.match(value):
             raise ValueError("Teléfono no válido")
         return value
@@ -87,7 +96,10 @@ class ReservationIn(BaseModel):
     @field_validator("name")
     @classmethod
     def clean_name(cls, value: str) -> str:
-        return " ".join(value.split())
+        value = " ".join(value.split())
+        if len(value) < 2:
+            raise ValueError("Nombre demasiado corto")
+        return value
 
     @field_validator("notes")
     @classmethod

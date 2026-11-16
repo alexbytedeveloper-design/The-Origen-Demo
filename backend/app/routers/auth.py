@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 import secrets
-from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..config import ACCESS_COOKIE, REFRESH_COOKIE, get_settings
+from ..config import ACCESS_COOKIE, REFRESH_COOKIE
 from ..db import get_db
-from ..deps import current_user
+from ..deps import optional_user
+from ..login_guard import check_guards, guard_keys, register_failure, reset_guards
 from ..models import User
+from ..net import client_host
 from ..rate_limit import limiter
 from ..schemas import LoginIn, RegisterIn, UserOut
 from ..security import (
@@ -30,21 +31,32 @@ from ..session import clear_session, issue_session
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 LOCKOUT_MESSAGE = {
-    "detail": "Demasiados intentos. Espera unos minutos.",
+    "detail": "Demasiados intentos. Espera antes de volver a probar.",
     "code": "too_many_attempts",
+}
+
+BLOCKED_MESSAGE = {
+    "detail": "Esta dirección quedó bloqueada. Contacta con el restaurante.",
+    "code": "ip_blocked",
 }
 
 
 def _client_key(request: Request, bucket: str) -> str:
-    host = request.client.host if request.client else "unknown"
-    return f"{bucket}:{host}"
+    return f"{bucket}:{client_host(request)}"
 
 
 def _too_many(retry_after: int) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
         detail=LOCKOUT_MESSAGE,
-        headers={"Retry-After": str(retry_after)},
+        headers={"Retry-After": str(max(retry_after, 1))},
+    )
+
+
+def _blocked() -> HTTPException:
+    return HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=BLOCKED_MESSAGE,
     )
 
 
@@ -105,38 +117,44 @@ async def login(
         raise _too_many(wait)
 
     email = payload.email.lower().strip()
+    wait = limiter.hit(f"login-email:{email}", limit=10, window=60)
+    if wait:
+        raise _too_many(wait)
+
+    keys = guard_keys(client_host(request), email)
+    locked = await check_guards(db, keys)
+    if locked is not None:
+        if locked.blocked:
+            raise _blocked()
+        raise _too_many(locked.retry_after)
+
+    async def failed() -> HTTPException:
+        state = await register_failure(db, keys)
+        if state is not None:
+            if state.blocked:
+                return _blocked()
+            return _too_many(state.retry_after)
+        return HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "detail": "Correo o contraseña incorrectos.",
+                "code": "invalid_credentials",
+            },
+        )
+
     user = await db.scalar(select(User).where(User.email == email))
 
     if user is None:
         verify_password(payload.password, DUMMY_HASH)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"detail": "Correo o contraseña incorrectos.", "code": "invalid_credentials"},
-        )
-
-    now = datetime.now(timezone.utc)
-    if user.locked_until and user.locked_until > now:
-        raise _too_many(int((user.locked_until - now).total_seconds()) + 1)
+        raise await failed()
 
     if not user.is_active or not verify_password(payload.password, user.password_hash):
-        settings = get_settings()
-        user.failed_attempts += 1
-        if user.failed_attempts >= settings.max_failed_attempts:
-            user.locked_until = now + timedelta(seconds=settings.lockout_seconds)
-            user.failed_attempts = 0
-            await db.commit()
-            raise _too_many(settings.lockout_seconds)
-        await db.commit()
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"detail": "Correo o contraseña incorrectos.", "code": "invalid_credentials"},
-        )
+        raise await failed()
 
     if needs_rehash(user.password_hash):
         user.password_hash = hash_password(payload.password)
 
-    user.failed_attempts = 0
-    user.locked_until = None
+    await reset_guards(db, keys)
     await issue_session(response, user, db)
     return user
 
@@ -157,6 +175,10 @@ async def _rotate_refresh(
         return None
 
     if not secrets.compare_digest(user.refresh_hash, token_fingerprint(token)):
+        # Un refresh que no coincide puede ser un token robado o una pestaña
+        # vieja: se revoca la sesión y la persona vuelve a entrar.
+        user.refresh_hash = None
+        await db.commit()
         return None
 
     await issue_session(response, user, db)
@@ -207,7 +229,7 @@ async def logout(
     request: Request,
     response: Response,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(current_user),
+    _: User | None = Depends(optional_user),
 ) -> Response:
     token = request.cookies.get(REFRESH_COOKIE)
     if token:

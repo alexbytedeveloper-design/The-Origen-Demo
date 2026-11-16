@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -22,15 +23,33 @@ def get_engine() -> AsyncEngine:
     global _engine
     if _engine is None:
         settings = get_settings()
-        connect_args = {}
+        engine_options: dict[str, object] = {
+            "echo": False,
+            "pool_pre_ping": True,
+        }
         if settings.database_url.startswith("sqlite"):
-            connect_args = {"check_same_thread": False}
-        _engine = create_async_engine(
-            settings.database_url,
-            echo=False,
-            pool_pre_ping=True,
-            connect_args=connect_args,
-        )
+            engine_options["connect_args"] = {"check_same_thread": False}
+        else:
+            # Postgres en producción: el pool se dimensiona por proceso. Con
+            # varias réplicas, el total es (DB_POOL_SIZE + DB_MAX_OVERFLOW) ×
+            # réplicas y debe quedar por debajo de max_connections.
+            engine_options.update(
+                pool_size=settings.db_pool_size,
+                max_overflow=settings.db_max_overflow,
+                pool_timeout=settings.db_pool_timeout,
+                pool_recycle=settings.db_pool_recycle,
+            )
+
+        _engine = create_async_engine(settings.database_url, **engine_options)
+        if settings.database_url.startswith("sqlite"):
+
+            @event.listens_for(_engine.sync_engine, "connect")
+            def _sqlite_pragmas(dbapi_connection, _record) -> None:
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA foreign_keys=ON")
+                cursor.execute("PRAGMA busy_timeout=5000")
+                cursor.close()
+
     return _engine
 
 

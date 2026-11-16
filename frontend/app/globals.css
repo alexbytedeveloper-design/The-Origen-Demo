@@ -60,6 +60,7 @@
   --ink-soft: #2a201b;
   --brass: #a87f3c;
   --brass-light: #cfa961;
+  --brass-ink: #7a5220;
   --wine: #5a1b25;
   --bottle: #1e3a2f;
   --muted: #6d6055;
@@ -266,7 +267,7 @@ textarea {
   font-family: var(--serif);
   font-size: 11px;
   letter-spacing: 0.06em;
-  color: var(--brass);
+  color: var(--brass-ink);
   box-shadow: inset 0 0 0 3px rgb(168 127 60 / 0.06);
 }
 
@@ -275,7 +276,7 @@ textarea {
   font-weight: 500;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--brass);
+  color: var(--brass-ink);
 }
 
 .section__meta-rule {
@@ -313,6 +314,17 @@ textarea {
 
 .section--dark .section__meta-rule {
   background: linear-gradient(90deg, rgb(207 169 97 / 0.45), transparent);
+}
+
+/* La barra usa verde botella sin la clase section--dark: el oro oscuro no
+   alcanza contraste sobre ese fondo. */
+.bar .section__index {
+  border-color: rgb(207 169 97 / 0.55);
+  color: var(--brass-light);
+}
+
+.bar .section__label {
+  color: var(--brass-light);
 }
 
 .section__ornament {
@@ -742,6 +754,9 @@ textarea {
   position: fixed;
   inset: var(--header-h) 0 auto;
   z-index: 99;
+  max-height: calc(100dvh - var(--header-h));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--paper);
   color: var(--ink);
   border-bottom: var(--hair);
@@ -928,7 +943,7 @@ textarea {
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--brass);
+  color: var(--brass-ink);
   padding-top: 3px;
 }
 
@@ -1014,7 +1029,7 @@ textarea {
       transparent 2px 8px
     ),
     linear-gradient(180deg, #251812 0%, #170f0c 44%, #1d1310 100%);
-  overflow: hidden;
+  overflow: clip;
 }
 
 .menu-page::before {
@@ -1198,6 +1213,12 @@ textarea {
   position: sticky;
   top: calc(var(--header-h) + 28px);
   padding: 22px 18px 18px;
+  max-height: calc(100vh - var(--header-h) - 56px);
+  max-height: calc(100dvh - var(--header-h) - 56px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(207 169 97 / 0.45) transparent;
   border: 1px solid rgb(207 169 97 / 0.28);
   background: linear-gradient(
     160deg,
@@ -1220,12 +1241,36 @@ textarea {
 }
 
 .menu-rail__title {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   padding-left: 10px;
   font-size: 9px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: rgb(207 169 97 / 0.85);
+}
+
+.menu-rail__progress {
+  position: relative;
+  height: 2px;
+  margin: 0 10px 16px;
+  overflow: hidden;
+  background: rgb(207 169 97 / 0.18);
+}
+
+.menu-rail__progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--brass), var(--brass-light));
+  transition: width 0.45s var(--ease);
+}
+
+.menu-rail::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu-rail::-webkit-scrollbar-thumb {
+  background: rgb(207 169 97 / 0.4);
+  border-radius: 999px;
 }
 
 .menu-rail__list {
@@ -1388,7 +1433,7 @@ textarea {
 
 .menu-chapter__paper {
   position: relative;
-  margin: clamp(-52px, -4vw, -28px) clamp(8px, 2.4vw, 30px) 0;
+  margin: clamp(14px, 1.8vw, 22px) clamp(8px, 2.4vw, 30px) 0;
   padding: clamp(30px, 4.4vw, 58px);
   background:
     radial-gradient(120% 90% at 50% 0%, #fdfaf4 0%, #f5ecdf 62%, #eee1cf 100%);
@@ -1409,7 +1454,7 @@ textarea {
 .menu-chapter__paper::after {
   content: "";
   position: absolute;
-  top: -5px;
+  top: 0;
   left: 50%;
   width: 9px;
   height: 9px;
@@ -1975,7 +2020,7 @@ textarea {
   font-family: var(--serif);
   font-size: 11px;
   letter-spacing: 0.18em;
-  color: var(--brass);
+  color: var(--brass-ink);
 }
 
 .event-card h3 {
@@ -2229,7 +2274,7 @@ textarea {
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--brass);
+  color: var(--brass-ink);
   padding-top: 3px;
 }
 
@@ -2340,8 +2385,8 @@ select.field__input {
 }
 
 .form__note a {
-  color: var(--brass);
-  border-bottom: 1px solid rgb(168 127 60 / 0.45);
+  color: var(--brass-ink);
+  border-bottom: 1px solid rgb(122 82 32 / 0.45);
 }
 
 .form__note a:hover {
@@ -2633,9 +2678,16 @@ select.field__input {
 
 /* --- Aparición al hacer scroll ------------------------------------------ */
 [data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.75s var(--ease), transform 0.75s var(--ease);
+}
+
+/* Solo se oculta lo que JavaScript marca como pendiente y está bajo el pliegue.
+   Sin JS, sin IntersectionObserver o en pestañas ocultas, todo queda visible. */
+[data-reveal].is-pending {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.75s var(--ease), transform 0.75s var(--ease);
 }
 
 [data-reveal].is-visible {
@@ -2792,7 +2844,7 @@ select.field__input {
     grid-template-columns: 1fr 1fr;
   }
 
-  /* La carta pasa a riel horizontal: el índice sigue a mano sin robar ancho. */
+  /* El menú pasa a riel horizontal: el índice sigue a mano sin robar ancho. */
   .menu-book {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -2806,8 +2858,13 @@ select.field__input {
     align-items: center;
     gap: 14px;
     padding: 9px 12px;
+    max-height: none;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
+    background: rgb(23 15 12 / 0.94);
+    box-shadow: 0 18px 32px -24px rgb(0 0 0 / 0.9);
   }
 
   .menu-rail::-webkit-scrollbar {
@@ -2816,8 +2873,13 @@ select.field__input {
 
   .menu-rail::before,
   .menu-rail__title,
+  .menu-rail__progress,
   .menu-rail__top {
     display: none;
+  }
+
+  .menu-chapter {
+    scroll-margin-top: calc(var(--header-h) + 84px);
   }
 
   .menu-rail__list {
@@ -2881,7 +2943,7 @@ select.field__input {
   }
 
   .menu-chapter__paper {
-    margin: -30px 0 0;
+    margin: 16px 0 0;
     padding: 30px 22px;
   }
 
@@ -2987,7 +3049,7 @@ select.field__input {
   }
 
   .menu-chapter__paper {
-    margin-top: -24px;
+    margin-top: 16px;
     padding: 26px 18px;
   }
 

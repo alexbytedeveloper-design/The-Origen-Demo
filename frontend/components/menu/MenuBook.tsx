@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { formatPrice } from "@/lib/format";
 import type {
@@ -160,6 +160,7 @@ export function MenuBook({
   locale: Locale;
 }) {
   const [active, setActive] = useState<string | null>(null);
+  const railRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!data) return;
@@ -183,8 +184,27 @@ export function MenuBook({
     );
 
     nodes.forEach((node) => observer.observe(node));
+    setActive((current) => current ?? data.menu.sections[0]?.id ?? null);
     return () => observer.disconnect();
   }, [data]);
+
+  useEffect(() => {
+    if (!active || !railRef.current) return;
+
+    const link = railRef.current.querySelector<HTMLElement>(
+      ".menu-rail__link.is-active",
+    );
+    if (!link) return;
+
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    link.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  }, [active]);
 
   if (status === "error") {
     return (
@@ -209,11 +229,17 @@ export function MenuBook({
   }
 
   const sections = data.menu.sections;
+  const activeIndex = sections.findIndex((section) => section.id === active);
+  const progress =
+    activeIndex >= 0 ? ((activeIndex + 1) / sections.length) * 100 : 0;
 
   return (
     <div className="menu-book">
-      <nav className="menu-rail" aria-label={dict.menu.navLabel}>
+      <nav className="menu-rail" aria-label={dict.menu.navLabel} ref={railRef}>
         <p className="menu-rail__title">{dict.menu.indexLabel}</p>
+        <div className="menu-rail__progress" aria-hidden="true">
+          <span style={{ width: `${progress}%` }} />
+        </div>
         <ol className="menu-rail__list">
           {sections.map((section, index) => {
             const isActive = active === section.id;
@@ -223,7 +249,7 @@ export function MenuBook({
                 <a
                   className={`menu-rail__link${isActive ? " is-active" : ""}`}
                   href={`#carta-${section.id}`}
-                  aria-current={isActive ? "true" : undefined}
+                  aria-current={isActive ? "location" : undefined}
                 >
                   <span className="menu-rail__num" aria-hidden="true">
                     {String(index + 1).padStart(2, "0")}

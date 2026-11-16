@@ -70,7 +70,7 @@ def decode_token(token: str, expected: TokenType) -> str | None:
             settings.jwt_secret,
             algorithms=["HS256"],
             issuer=settings.jwt_issuer,
-            options={"require": ["exp", "iat", "sub", "typ"]},
+            options={"require": ["exp", "iat", "sub", "typ", "jti"]},
         )
     except jwt.PyJWTError:
         return None
@@ -78,7 +78,9 @@ def decode_token(token: str, expected: TokenType) -> str | None:
     if payload.get("typ") != expected:
         return None
     subject = payload.get("sub")
-    return subject if isinstance(subject, str) and subject else None
+    if not isinstance(subject, str) or not subject or len(subject) > 64:
+        return None
+    return subject
 
 
 def token_fingerprint(token: str) -> str:

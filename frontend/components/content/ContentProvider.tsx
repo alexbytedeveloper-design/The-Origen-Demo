@@ -23,18 +23,21 @@ type ContentValue = {
 const ContentContext = createContext<ContentValue | null>(null);
 
 /**
- * La carta, las reseñas y la barra llegan en una sola llamada y solo cuando
- * la carta está a punto de entrar en pantalla. El hero y la casa van en HTML.
+ * La carta, las reseñas y la barra llegan en una sola llamada. En la primera
+ * visita el HTML ya trae los datos del servidor; esta carga queda como
+ * reintento si esa primera petición falló.
  */
 export function ContentProvider({
   locale,
+  initialData = null,
   children,
 }: {
   locale: string;
+  initialData?: ContentPayload | null;
   children: ReactNode;
 }) {
-  const [status, setStatus] = useState<Status>("idle");
-  const [data, setData] = useState<ContentPayload | null>(null);
+  const [status, setStatus] = useState<Status>(initialData ? "ready" : "idle");
+  const [data, setData] = useState<ContentPayload | null>(initialData);
   const inFlight = useRef(false);
 
   const load = useCallback(() => {

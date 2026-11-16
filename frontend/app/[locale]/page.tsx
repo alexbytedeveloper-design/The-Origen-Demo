@@ -9,6 +9,7 @@ import { Hero } from "@/components/sections/Hero";
 import { House } from "@/components/sections/House";
 import { Reviews } from "@/components/sections/Reviews";
 import { getDictionary, isLocale } from "@/messages";
+import { getInitialContent } from "@/lib/server-content";
 
 export default async function HomePage({
   params,
@@ -19,9 +20,10 @@ export default async function HomePage({
   if (!isLocale(locale)) notFound();
 
   const dict = getDictionary(locale);
+  const content = await getInitialContent(locale);
 
   return (
-    <ContentProvider locale={locale}>
+    <ContentProvider locale={locale} initialData={content}>
       <Hero dict={dict} locale={locale} />
       <House dict={dict} />
       <Fire dict={dict} />
