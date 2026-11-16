@@ -1,18 +1,5 @@
 import type { NextConfig } from "next";
 
-/**
- * Destino de las reescrituras de `/backend/*`.
- *
- * Se lee en el servidor: `API_INTERNAL_URL` permite apuntar al servicio interno
- * (`http://api:8000` en docker-compose) y `NEXT_PUBLIC_API_URL` al backend
- * público (`https://the-origen-backend.vercel.app` en producción).
- */
-const apiOrigin = (
-  process.env.API_INTERNAL_URL?.trim() ||
-  process.env.NEXT_PUBLIC_API_URL?.trim() ||
-  "http://localhost:8000"
-).replace(/\/+$/, "");
-
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
@@ -54,13 +41,6 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
-    ];
-  },
-  async rewrites() {
-    return [
-      // El navegador solo habla con Next: cookies de sesión y CSRF quedan en
-      // el mismo origen y el backend no necesita exponerse al navegador.
-      { source: "/backend/:path*", destination: `${apiOrigin}/:path*` },
     ];
   },
   async redirects() {
