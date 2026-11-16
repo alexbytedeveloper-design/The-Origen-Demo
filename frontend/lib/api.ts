@@ -68,7 +68,7 @@ export class ApiError extends Error {
   }
 }
 
-const BASE = "/backend/api/v1";
+const BASE = "/api";
 
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -149,4 +149,4 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
-};
+};

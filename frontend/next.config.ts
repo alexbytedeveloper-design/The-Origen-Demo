@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const apiUrl = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:8000";
+const apiUrl = "/api";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -25,20 +25,10 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [360, 480, 640, 828, 1080, 1280, 1600, 1920],
   },
-  async rewrites() {
-    return [
-      // El navegador solo habla con Next: cookies de sesión y CSRF quedan
-      // en el mismo origen y el backend no necesita exponerse a internet.
-      { source: "/backend/:path*", destination: `${apiUrl}/:path*` },
-    ];
-  },
-  async redirects() {
-    return [{ source: "/", destination: "/es", permanent: false }];
-  },
   async headers() {
     return [
       {
-        source: "/((?!backend).*)",
+        source: "/((?!_next/static|_next/image|favicon.ico|icon.svg).*)",
         headers: securityHeaders,
       },
       {
@@ -55,6 +45,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Ya no necesitamos rewrite: las API routes están en /api/
+    ];
+  },
+  async redirects() {
+    return [{ source: "/", destination: "/es", permanent: false }];
+  },
 };
 
-export default nextConfig;
+export default nextConfig;

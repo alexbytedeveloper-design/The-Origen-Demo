@@ -1,6 +1,6 @@
 import type { ContentPayload } from "@/lib/api";
 
-const API_URL = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:8000";
+const API_URL = "/api";
 
 /**
  * Carga inicial de la carta en el servidor.
@@ -18,12 +18,12 @@ export async function getInitialContent(
 
   try {
     const response = await fetch(
-      `${API_URL}/api/v1/content/${encodeURIComponent(locale)}`,
+      `/api/content/${encodeURIComponent(locale)}`,
       {
         cache: "no-store",
         headers: { Accept: "application/json" },
         signal: controller.signal,
-      },
+      }
     );
 
     if (!response.ok) return null;
@@ -46,4 +46,4 @@ export async function getInitialContent(
   } finally {
     clearTimeout(timer);
   }
-}
+}
